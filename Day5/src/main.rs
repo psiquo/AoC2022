@@ -29,15 +29,14 @@ impl<'a> CargoPlate<'a> {
         }
     }
     fn cargo_move_times(&mut self, from : usize, to : usize, count : usize) {
+        let mut tmp : Vec<&str> = Vec::new();
         for _ in 0..count {
-            self.cargo_move(from, to);
+            let cont = self.columns[from-1].pop().expect("Cannot move from empty column");
+            tmp.push(cont);
         }
-    }
 
-    fn cargo_move(&mut self, from : usize, to : usize){
-        let cont = self.columns[from-1].pop().expect("Cannot move from empty column");
-        self.columns[to-1].push(cont);
-        
+        tmp.reverse();
+        self.columns[to-1].append(&mut tmp);
     }
 
     fn print(&self) {
