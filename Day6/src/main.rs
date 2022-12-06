@@ -17,7 +17,7 @@ fn main() {
 
         datapacket.push(c);
 
-        if datapacket.len() == 4 {
+        if datapacket.len() == 14 {
             println!("{}",i+1);
             break;
         }
