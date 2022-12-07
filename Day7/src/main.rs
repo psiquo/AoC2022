@@ -84,6 +84,21 @@ fn main() {
     }
 
     println!("{}",tot);
+
+    let updatesize = 30000000;
+    let unusedspace = 70000000 - get_dir_size("/", &fs);
+    let mut min = get_dir_size("/", &fs);
+
+    for dname in fs.keys() {
+        let tmp = get_dir_size(dname, &fs);
+        
+        if updatesize <= (unusedspace+ tmp) && tmp < min  {
+            min = tmp;
+        }
+    }
+
+    println!("{}",min);
+
 }
 
 
