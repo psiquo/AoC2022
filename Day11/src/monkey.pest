@@ -1,0 +1,19 @@
+digit = {'0'..'9'}
+num = { digit+  }
+ws = _{ " " | "\t" | "\n" }
+monkey_decl = { "Monkey " ~ num ~ ":" } 
+
+items = { "Starting items: " ~ (num ~ (", ")?)* }
+
+op = { "+" | "*" }
+ident = { "old" }
+operation = { "Operation: new = old" ~ " " ~ op ~ " " ~ (ident | num) }
+
+test = { "Test: divisible by " ~ num }
+
+cond_value = { "true" | "false" }
+cond = { "If " ~ cond_value ~ ": throw to monkey " ~ num }
+
+monkey = { monkey_decl ~ ws* ~ items ~ ws* ~ operation ~ ws* ~ test ~ ws* ~ (cond ~ ws*)+}
+
+monkeys = { (monkey ~ ws*)+}
