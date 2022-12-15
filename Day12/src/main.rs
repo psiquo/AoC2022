@@ -18,7 +18,7 @@ struct State {
 }
 
 impl State {
-    fn new(pos : (usize,usize),matr : Vec<Vec<(char,i32)>>) -> Self {
+    fn new(pos : (usize,usize),matr : &Vec<Vec<(char,i32)>>) -> Self {
         let height = State::get_height(matr[pos.0][pos.1].0);
         State { pos, height, len : 0}
     }
@@ -103,16 +103,15 @@ fn main() {
 
     let input = fs::read_to_string(&args[1]).expect("Cannot read input file");
     let mut matrix = Vec::<Vec<(char,i32)>>::new();
-    let mut start = (0,0);
+    let mut start = Vec::<(usize,usize)>::new();
     let mut end = (0,0);
 
     for (l,line) in input.trim().split("\n").enumerate() {
         let mut mat_line = Vec::<(char,i32)>::new();
         for (c,ch) in line.chars().enumerate() {
-            if ch == 'S' {
+            if ch == 'S' || ch == 'a' {
                 mat_line.push(('a',-1));
-                start.0 = l;
-                start.1 = c;
+                start.push((l,c));
             } else if ch == 'E' {
                 mat_line.push(('z',-1));
                 end.0 = l;
@@ -124,30 +123,44 @@ fn main() {
         matrix.push(mat_line);
     }
 
-    let mut states = vec![State::new(start, matrix.clone())];
-    let mut finished = Vec::<State>::new();
+    let starts : Vec<State>= start.iter().map(|x| State::new(*x,&matrix)).collect();
 
-    while !states.is_empty() {
-        let mut next_states = Vec::<State>::new();
+    let mut dists = Vec::<u32>::new();
 
-        for state in states.iter() {
-            next_states.append(&mut state.next_states(&mut matrix));
+    
+    for s in starts.iter() {
+        //println!("On state {}",s);
+        let mut states = vec![s.clone()];
+
+        while !states.is_empty() {
+            let mut next_states = Vec::<State>::new();
+
+            for state in states.iter() {
+                next_states.append(&mut state.next_states(&mut matrix));
+            }
+
+            for i in 0..next_states.len() {
+                if next_states[i].pos == end {
+                    //println!("Found finish state (index {}): {}",i,next_states[i]);
+                    dists.push(next_states[i].len);
+                    next_states.clear();
+                    states.clear();
+                    break;
+                }
+            }
+            
+            states = next_states;
         }
 
-        for i in 0..next_states.len() {
-            if next_states[i].pos == end {
-                println!("Found finish state (index {}): {}",i,next_states[i]);
-                return;
+        for x in matrix.iter_mut() {
+            for y in x.iter_mut() {
+                y.1 = -1;
             }
         }
-
-        if !finished.is_empty() {
-            return;
-        }
-
-        states = next_states;
-
-        println!("{}",states.len());
     }
+
+    let min = dists.iter().fold(dists[0],|a,b| a.min(*b));
+
+    println!("Minimum distance {}", min);
 
 }
