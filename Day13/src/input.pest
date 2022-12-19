@@ -1,0 +1,7 @@
+digit = {'0'..'9'}
+num = { digit+  }
+
+list = { "[" ~ ((num | list) ~ ",")* ~ (num | list)? ~ "]"}
+packet = { list ~ "\n" ~ list ~ "\n"}
+
+input = { (packet ~ "\n")* ~ packet? }
